@@ -10,7 +10,7 @@
 ### **Задачи работы**
 1. Установить и запустить SSH-сервер на двух виртуальных машинах под ALT Linux.
 2. Создать специального пользователя для SSH-доступа.
-3. Изучить и настроить основные параметры конфигурации SSH-сервера (`/etc/ssh/sshd_config`).
+3. Изучить и настроить основные параметры конфигурации SSH-сервера (`/etc/openssh/sshd_config`).
 4. Ограничить доступ к SSH по пользователям и группам.
 5. Настроить клиентский файл `~/.ssh/config` с использованием `ProxyJump` для доступа к изолированной машине.
 6. Выполнить подключение по паролю.
@@ -95,17 +95,17 @@ systemctl enable sshd
 
 ---
 
-#### **Шаг 3: Настройка файла `/etc/ssh/sshd_config`**
+#### **Шаг 3: Настройка файла `/etc/openssh/sshd_config`**
 
 Откройте конфигурационный файл:
 
 ```bash
- nano /etc/ssh/sshd_config
+ nano /etc/openssh/sshd_config
 ```
 
 ---
 
-##### **Описание ключевых параметров `/etc/ssh/sshd_config`**
+##### **Описание ключевых параметров `/etc/openssh/sshd_config`**
 
 | Параметр | Описание | Рекомендуемое значение |
 |--------|---------|------------------------|
@@ -129,7 +129,7 @@ systemctl enable sshd
 
 ---
 
-##### **Пример конфигурации `/etc/ssh/sshd_config`**
+##### **Пример конфигурации `/etc/openssh/sshd_config`**
 
 ```conf
 Port 22
@@ -143,7 +143,7 @@ UsePAM yes
 X11Forwarding yes
 PrintMotd no
 AcceptEnv LANG LC_*
-Subsystem sftp /usr/lib/ssh/sftp-server
+Subsystem sftp /usr/lib/openssh/sftp-server
 
 # Контроль доступа
 AllowUsers sshuser
@@ -240,7 +240,7 @@ ssh isp        # Прямое подключение
 
 #### **Шаг 9: Отключение аутентификации по паролю**
 
-На **isp и srv** отредактируйте `/etc/ssh/sshd_config`:
+На **isp и srv** отредактируйте `/etc/openssh/sshd_config`:
 
 ```conf
 PasswordAuthentication no
@@ -281,7 +281,7 @@ PasswordAuthentication no
 В ходе лабораторной работы были выполнены:
 - Установка и настройка SSH-сервера на двух виртуальных машинах под ALT Linux.
 - Создан и настроен пользователь `sshuser`.
-- Изучены и применены ключевые параметры `/etc/ssh/sshd_config`.
+- Изучены и применены ключевые параметры `/etc/openssh/sshd_config`.
 - Реализовано управление доступом по пользователям.
 - Настроен клиентский доступ через `ProxyJump`.
 - Выполнена настройка аутентификации по ключам.
