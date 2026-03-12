@@ -44,15 +44,6 @@
 
 #### Шаг 1: Подготовка системы
 Данная работа выполняется на ВМ server.
-**Проверка наличия LVM:**
-```bash
-# Проверка установки LVM
-which lvm
-
-# Если не установлен, установить
-sudo apt-get update
-sudo apt-get install lvm2
-```
 
 **Проверка доступных дисков:**
 ```bash
@@ -60,9 +51,9 @@ sudo apt-get install lvm2
 lsblk
 
 # Проверка существующих LVM томов
-sudo pvdisplay
-sudo vgdisplay
-sudo lvdisplay
+  pvdisplay
+  vgdisplay
+  lvdisplay
 ```
 
 #### Шаг 2: Создание физических томов
@@ -71,23 +62,23 @@ sudo lvdisplay
 ```bash
 # Используем диски /dev/vdb, /dev/vdc, /dev/vdd
 # Проверка, что диски не используются
-sudo umount /dev/vdb* 2>/dev/null || true
-sudo umount /dev/vdc* 2>/dev/null || true
-sudo umount /dev/vdd* 2>/dev/null || true
+  umount /dev/vdb* 2>/dev/null || true
+  umount /dev/vdc* 2>/dev/null || true
+  umount /dev/vdd* 2>/dev/null || true
 
 # Очистка дисков (если нужно)
-sudo mdadm --zero-superblock /dev/vdb /dev/vdc /dev/vdd 2>/dev/null || true
-sudo wipefs -a /dev/vdb /dev/vdc /dev/vdd 2>/dev/null || true
+  mdadm --zero-superblock /dev/vdb /dev/vdc /dev/vdd 2>/dev/null || true
+  wipefs -a /dev/vdb /dev/vdc /dev/vdd 2>/dev/null || true
 ```
 
 **Создание физических томов:**
 ```bash
 # Создание физических томов
-sudo pvcreate /dev/vdb /dev/vdc /dev/vdd
+  pvcreate /dev/vdb /dev/vdc /dev/vdd
 
 # Проверка создания PV
-sudo pvdisplay
-sudo pvs
+  pvdisplay
+  pvs
 ```
 
 #### Шаг 3: Создание группы томов
@@ -95,29 +86,29 @@ sudo pvs
 **Создание VG:**
 ```bash
 # Создание группы томов
-sudo vgcreate vg_data /dev/vdb /dev/vdc /dev/vdd
+  vgcreate vg_data /dev/vdb /dev/vdc /dev/vdd
 
 # Проверка создания VG
-sudo vgdisplay vg_data
-sudo vgs
+  vgdisplay vg_data
+  vgs
 ```
 
 #### Шаг 4: Создание логических томов
 
 **Создание LV:**
 ```bash
-# Создание логического тома для home (40% от VG)
-sudo lvcreate -L 400M -n lv_home vg_data
+# Создание логического тома для home 
+  lvcreate -L 400M -n lv_home vg_data
 
-# Создание логического тома для var (30% от VG)
-sudo lvcreate -L 300M -n lv_var vg_data
+# Создание логического тома для var 
+  lvcreate -L 300M -n lv_var vg_data
 
-# Создание логического тома для tmp (оставшееся пространство)
-sudo lvcreate -l 100%FREE -n lv_tmp vg_data
+# Создание логического тома для tmp 
+  lvcreate -l 500M -n lv_tmp vg_data
 
 # Проверка создания LV
-sudo lvdisplay
-sudo lvs
+  lvdisplay
+  lvs
 ```
 
 #### Шаг 5: Форматирование и монтирование
@@ -125,35 +116,35 @@ sudo lvs
 **Форматирование LV:**
 ```bash
 # Форматирование в ext4
-sudo mkfs.ext4 /dev/vg_data/lv_home
-sudo mkfs.ext4 /dev/vg_data/lv_var
-sudo mkfs.ext4 /dev/vg_data/lv_tmp
+  mkfs.ext4 /dev/vg_data/lv_home
+  mkfs.ext4 /dev/vg_data/lv_var
+  mkfs.ext4 /dev/vg_data/lv_tmp
 
 # Добавление меток
-sudo e2label /dev/vg_data/lv_home LVM_HOME
-sudo e2label /dev/vg_data/lv_var LVM_VAR
-sudo e2label /dev/vg_data/lv_tmp LVM_TMP
+  e2label /dev/vg_data/lv_home LVM_HOME
+  e2label /dev/vg_data/lv_var LVM_VAR
+  e2label /dev/vg_data/lv_tmp LVM_TMP
 ```
 
 **Создание точек монтирования:**
 ```bash
 # Создание каталогов
-sudo mkdir -p /mnt/lvm_home
-sudo mkdir -p /mnt/lvm_var
-sudo mkdir -p /mnt/lvm_tmp
+  mkdir -p /mnt/lvm_home
+  mkdir -p /mnt/lvm_var
+  mkdir -p /mnt/lvm_tmp
 
 # Установка прав доступа
-sudo chmod 755 /mnt/lvm_home
-sudo chmod 755 /mnt/lvm_var
-sudo chmod 755 /mnt/lvm_tmp
+  chmod 755 /mnt/lvm_home
+  chmod 755 /mnt/lvm_var
+  chmod 755 /mnt/lvm_tmp
 ```
 
 **Монтирование LV:**
 ```bash
 # Монтирование логических томов
-sudo mount /dev/vg_data/lv_home /mnt/lvm_home
-sudo mount /dev/vg_data/lv_var /mnt/lvm_var
-sudo mount /dev/vg_data/lv_tmp /mnt/lvm_tmp
+  mount /dev/vg_data/lv_home /mnt/lvm_home
+  mount /dev/vg_data/lv_var /mnt/lvm_var
+  mount /dev/vg_data/lv_tmp /mnt/lvm_tmp
 
 # Проверка монтирования
 df -h
@@ -165,32 +156,32 @@ mount | grep lvm
 **Увеличение размера LV:**
 ```bash
 # Увеличение lv_home на 100M
-sudo lvextend -L +100M /dev/vg_data/lv_home
+  lvextend -L +100M /dev/vg_data/lv_home
 
 # Расширение файловой системы
-sudo resize2fs /dev/vg_data/lv_home
+  resize2fs /dev/vg_data/lv_home
 
 # Проверка изменений
 df -h
-sudo lvs
+  lvs
 ```
 
 **Уменьшение размера LV:**
 ```bash
 # Размонтирование тома
-sudo umount /mnt/lvm_tmp
+  umount /mnt/lvm_tmp
 
 # Проверка файловой системы
-sudo e2fsck -f /dev/vg_data/lv_tmp
+  e2fsck -f /dev/vg_data/lv_tmp
 
 # Уменьшение файловой системы
-sudo resize2fs /dev/vg_data/lv_tmp 200M
+  resize2fs /dev/vg_data/lv_tmp 200M
 
 # Уменьшение логического тома
-sudo lvreduce -L 200M /dev/vg_data/lv_tmp
+  lvreduce -L 200M /dev/vg_data/lv_tmp
 
 # Повторное монтирование
-sudo mount /dev/vg_data/lv_tmp /mnt/lvm_tmp
+  mount /dev/vg_data/lv_tmp /mnt/lvm_tmp
 ```
 
 #### Шаг 7: Постоянное монтирование LVM томов
@@ -198,52 +189,31 @@ sudo mount /dev/vg_data/lv_tmp /mnt/lvm_tmp
 **Резервное копирование fstab:**
 ```bash
 # Резервное копирование
-sudo cp /etc/fstab /etc/fstab.backup
+  cp /etc/fstab /etc/fstab.backup
 ```
 
 **Добавление записей в fstab:**
 ```bash
 # Получение UUID томов
-sudo blkid /dev/vg_data/lv_home
-sudo blkid /dev/vg_data/lv_var
-sudo blkid /dev/vg_data/lv_tmp
+  blkid /dev/vg_data/lv_home
+  blkid /dev/vg_data/lv_var
+  blkid /dev/vg_data/lv_tmp
 
 # Добавление записей в fstab
-echo 'UUID=ваш-uuid-lv_home /mnt/lvm_home ext4 defaults 0 2' | sudo tee -a /etc/fstab
-echo 'UUID=ваш-uuid-lv_var /mnt/lvm_var ext4 defaults 0 2' | sudo tee -a /etc/fstab
-echo 'UUID=ваш-uuid-lv_tmp /mnt/lvm_tmp ext4 defaults 0 2' | sudo tee -a /etc/fstab
+echo 'UUID=ваш-uuid-lv_home /mnt/lvm_home ext4 defaults 0 2' |   tee -a /etc/fstab
+echo 'UUID=ваш-uuid-lv_var /mnt/lvm_var ext4 defaults 0 2' |   tee -a /etc/fstab
+echo 'UUID=ваш-uuid-lv_tmp /mnt/lvm_tmp ext4 defaults 0 2' |   tee -a /etc/fstab
 ```
 
 **Проверка конфигурации:**
 ```bash
 # Проверка синтаксиса
-sudo mount -a
+  mount -a
 
 # Проверка успешного монтирования
 df -h
 mount | grep lvm
 ```
-
-#### Шаг 8: Индивидуальное задание
-
-**Варианты заданий:**
-
-| Вариант | Конфигурация LVM | Особенности |
-|---------|------------------|-------------|
-| **1** | Создание VG из 2 дисков, 3 LV | Стандартная конфигурация |
-| **2** | Создание VG из 3 дисков, изменение размеров | Динамическое управление |
-| **3** | Создание VG, добавление нового диска | Расширение группы томов |
-| **4** | Создание VG, создание снимков | Работа с LVM снимками |
-| **5** | Комбинированная задача | Полный цикл работы с LVM |
-
-**Общая логика задания:**
-
-1. Создать физические тома из доступных дисков
-2. Создать группу томов
-3. Создать логические тома с заданными размерами
-4. Отформатировать и смонтировать LV
-5. Настроить постоянное монтирование
-6. Продемонстрировать изменение размеров томов
 
 ## Требования к отчету
 
@@ -267,35 +237,25 @@ mount | grep lvm
 ## Контрольные вопросы
 
 1. **Что такое LVM и для чего он используется?**
-   - Система управления логическими томами для гибкого управления дисковым пространством
-
+  
 2. **Какие компоненты входят в архитектуру LVM?**
-   - Физические тома (PV), группы томов (VG), логические тома (LV)
-
+ 
 3. **Какие преимущества LVM перед обычными разделами?**
-   - Гибкость изменения размеров, объединение дисков, снимки
-
+ 
 4. **Как добавить новый диск в существующую VG?**
-   - `pvcreate`, затем `vgextend`
-
+ 
 5. **Как увеличить размер LV?**
-   - `lvextend`, затем `resize2fs`
-
+ 
 6. **Что такое LVM снимки?**
-   - Моментальные копии состояния LV для резервного копирования
-
+ 
 7. **Как проверить состояние LVM системы?**
-   - `pvdisplay`, `vgdisplay`, `lvdisplay`
-
+ 
 8. **Как удалить LV?**
-   - `lvremove` (предварительно размонтировать и удалить из fstab)
-
+ 
 9. **Что такое PE в LVM?**
-   - Physical Extent - минимальная единица распределения空间 в VG
-
+ 
 10. **Какие файловые системы можно использовать с LVM?**
-    - Любые: ext4, xfs, btrfs и другие
-
+ 
 ## Типичные проблемы и их решения
 
 ### Проблема 1: "No space left on device" при создании LV
@@ -303,7 +263,7 @@ mount | grep lvm
 **Решение:**
 ```bash
 # Проверить свободное место
-sudo vgdisplay vg_data
+  vgdisplay vg_data
 # Уменьшить размер других LV или добавить новый PV
 ```
 
@@ -312,9 +272,9 @@ sudo vgdisplay vg_data
 **Решение:**
 ```bash
 # Активировать LV
-sudo vgchange -ay
+  vgchange -ay
 # Или активировать конкретную VG
-sudo vgchange -ay vg_data
+  vgchange -ay vg_data
 ```
 
 ### Проблема 3: Ошибка при изменении размера LV
@@ -322,7 +282,7 @@ sudo vgchange -ay vg_data
 **Решение:**
 ```bash
 # Проверить файловую систему
-sudo e2fsck -f /dev/vg_data/lv_name
+  e2fsck -f /dev/vg_data/lv_name
 # Для уменьшения: сначала уменьшить ФС, потом LV
 ```
 
@@ -331,9 +291,9 @@ sudo e2fsck -f /dev/vg_data/lv_name
 **Решение:**
 ```bash
 # Активировать VG
-sudo vgchange -ay
+  vgchange -ay
 # Проверить fstab
-sudo cat /etc/fstab
+  cat /etc/fstab
 ```
 
 ### Проблема 5: Ошибка при добавлении диска в VG
@@ -341,9 +301,9 @@ sudo cat /etc/fstab
 **Решение:**
 ```bash
 # Создать PV
-sudo pvcreate /dev/диск
+  pvcreate /dev/диск
 # Проверить занятость диска
-sudo lsof +D /путь
+  lsof +D /путь
 ```
 
 ## Рекомендации по безопасности
@@ -358,7 +318,7 @@ sudo lsof +D /путь
 
 3. **Работа с правами root**
    - Выполняйте команды с минимально необходимыми привилегиями
-   - Не используйте `sudo` без необходимости
+   - Не используйте ` ` без необходимости
 
 4. **Мониторинг системы**
    - Регулярно проверяйте состояние LVM
