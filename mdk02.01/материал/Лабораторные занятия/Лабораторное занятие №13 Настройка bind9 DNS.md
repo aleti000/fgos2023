@@ -201,7 +201,7 @@ $TTL    1D
                                 1H              ; ncache
                         )
         IN      NS      srv.sa.test.
-        IN      A       192.168.1.10
+        IN      A       192.168.1.3
 
 # DNS-сервер
 srv     IN      A       192.168.1.3
