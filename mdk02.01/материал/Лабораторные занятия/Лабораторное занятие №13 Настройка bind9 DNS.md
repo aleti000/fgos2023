@@ -193,7 +193,7 @@ nano /var/lib/bind/zone/sa.test
 ```conf
 # /var/lib/bind/zone/sa.test
 $TTL    1D
-@       IN      SOA     srv.sa.test. admin.sa.test. (
+@       IN      SOA     sa.test. root.sa.test. (
                                 2023120101      ; serial
                                 12H             ; refresh
                                 1H              ; retry
@@ -232,7 +232,7 @@ nano /var/lib/bind/zone/1.168.192.in-addr.arpa
 ```conf
 # /var/lib/bind/zone/1.168.192.in-addr.arpa
 $TTL    1D
-@       IN      SOA     srv.sa.test. admin.sa.test. (
+@       IN      SOA     sa.test. root.sa.test. (
                                 2023120101      ; serial
                                 12H             ; refresh
                                 1H              ; retry
@@ -315,7 +315,16 @@ chkconfig --list bind
 ### 6. Настройка клиентов
 
 #### 6.1. Настройка DNS-сервера на клиентах
-На машинах ISP, CLI и SRV настройте DNS-сервер:
+На машине ISP настройте DNS-сервер:
+
+```bash
+# Настройка локального DNS-сервера
+cat > /etc/net/ifaces/ens19/resolv.conf << 'EOF'
+domain sa.test
+nameserver 192.168.1.3
+EOF
+```
+На машине srv настройте DNS-сервер:
 
 ```bash
 # Настройка локального DNS-сервера
@@ -323,6 +332,18 @@ cat > /etc/net/ifaces/ens18/resolv.conf << 'EOF'
 domain sa.test
 nameserver 192.168.1.3
 EOF
+```
+
+Для настройки DNS на машине cli нужно внести дополнительные опции в настройки DHCP-сервера на машине isp:
+
+```bash
+option domain-name-servers 192.168.1.3;
+option domain-name "sa.test";
+```
+
+На машине cli обновить настройки сети:
+```bash
+systemctl restart NetworkManager
 ```
 
 #### 6.2. Проверка настроек
