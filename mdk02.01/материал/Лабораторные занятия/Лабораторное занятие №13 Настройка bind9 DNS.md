@@ -145,17 +145,6 @@ options {
     listen-on { 192.168.1.3; };
     listen-on-v6 { any; };
     
-    # Логирование
-    logging {
-        channel default_log {
-            file "/var/log/named.log" versions 3 size 5m;
-            severity info;
-            print-time yes;
-            print-severity yes;
-            print-category yes;
-        };
-        category default { default_log; };
-    };
 };
 ```
 
