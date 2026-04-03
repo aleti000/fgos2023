@@ -97,7 +97,7 @@ apt-get install bind-utils -y
 named -v
 
 # Проверка структуры chroot-окружения
-ls -la /var/lib/bind/
+ls -la /etc/bind/
 
 # Проверка состояния службы
 service bind status
@@ -106,13 +106,13 @@ service bind status
 #### 2.3. Проверка конфигурационных файлов
 ```bash
 # Проверка главного конфигурационного файла
-ls -la /etc/named.conf
+ls -la /etc/bind/named.conf
 
 # Проверка каталога конфигурации
-ls -la /var/lib/bind/etc/
+ls -la /etc/bind
 
 # Проверка каталога зон
-ls -la /var/lib/bind/zone/
+ls -la /etc/bind/zone/
 ```
 
 ### 3. Настройка основных параметров DNS-сервера
@@ -121,17 +121,16 @@ ls -la /var/lib/bind/zone/
 Откройте файл настроек:
 
 ```bash
-nano /var/lib/bind/etc/options.conf
+nano /etvc/bind/options.conf
 ```
 
 #### 3.2. Настройка параметров
 Добавьте или измените следующие параметры:
 
 ```conf
-# /var/lib/bind/etc/options.conf
+# /etc/bind/options.conf
 options {
-    directory "/var/lib/bind/zone";
-    
+        
     # Настройка вышестоящих DNS-серверов
     forwarders {
         8.8.8.8;      # Google DNS
@@ -151,7 +150,7 @@ options {
 #### 3.3. Проверка настроек
 ```bash
 # Проверка настроек allow-query и allow-recursion
-grep -A 5 "allow-" /var/lib/bind/etc/options.conf
+grep -A 5 "allow-" /etc/bind/options.conf
 ```
 
 #### 3.4. Применение изменений
@@ -170,17 +169,17 @@ service bind status
 **4.1.1. Копирование пустого шаблона**
 ```bash
 # Копирование файла empty для создания прямой зоны
-cp /var/lib/bind/zone/empty /var/lib/bind/zone/sa.test
+cp /etc/bind/zone/empty /etc/bind/zone/sa.test
 ```
 
 **4.1.2. Редактирование прямой зоны**
 ```bash
-nano /var/lib/bind/zone/sa.test
+nano /etc/bind/zone/sa.test
 ```
 
 **4.1.3. Заполнение прямой зоны**
 ```conf
-# /var/lib/bind/zone/sa.test
+# /etc/bind/zone/sa.test
 $TTL    1D
 @       IN      SOA     sa.test. root.sa.test. (
                                 2023120101      ; serial
@@ -209,17 +208,17 @@ ftp     IN      CNAME   srv.sa.test.
 **4.2.1. Копирование пустого шаблона**
 ```bash
 # Копирование файла empty для создания обратной зоны
-cp /var/lib/bind/zone/empty /var/lib/bind/zone/1.168.192.in-addr.arpa
+cp /etc/bind/zone/empty /etc/bind/zone/1.168.192.in-addr.arpa
 ```
 
 **4.2.2. Редактирование обратной зоны**
 ```bash
-nano /var/lib/bind/zone/1.168.192.in-addr.arpa
+nano /etc/bind/zone/1.168.192.in-addr.arpa
 ```
 
 **4.2.3. Заполнение обратной зоны**
 ```conf
-# /var/lib/bind/zone/1.168.192.in-addr.arpa
+# /etc/bind/zone/1.168.192.in-addr.arpa
 $TTL    1D
 @       IN      SOA     sa.test. root.sa.test. (
                                 2023120101      ; serial
@@ -240,12 +239,12 @@ $TTL    1D
 
 **4.3.1. Редактирование local.conf**
 ```bash
-nano /var/lib/bind/etc/local.conf
+nano /etc/bind/local.conf
 ```
 
 **4.3.2. Добавление описания зон**
 ```conf
-# /var/lib/bind/etc/local.conf
+# /etc/bind/local.conf
 zone "sa.test" {
     type master;
     file "sa.test";
@@ -262,16 +261,16 @@ zone "1.168.192.in-addr.arpa" {
 #### 5.1. Проверка конфигурации
 ```bash
 # Проверка синтаксиса главного конфигурационного файла
-named-checkconf /var/lib/bind/etc/named.conf
+named-checkconf /etc/bind/named.conf
 
 # Проверка синтаксиса локальных зон
-named-checkconf /var/lib/bind/etc/local.conf
+named-checkconf /etc/bind/local.conf
 
 # Проверка прямой зоны
-named-checkzone sa.test /var/lib/bind/zone/sa.test
+named-checkzone sa.test /etc/bind/zone/sa.test
 
 # Проверка обратной зоны
-named-checkzone 1.168.192.in-addr.arpa /var/lib/bind/zone/1.168.192.in-addr.arpa
+named-checkzone 1.168.192.in-addr.arpa /etc/bind/zone/1.168.192.in-addr.arpa
 ```
 
 #### 5.2. Применение изменений
@@ -386,35 +385,17 @@ time nslookup google.com
 time nslookup google.com
 ```
 
-### 8. Диагностика и устранение проблем
 
-#### 8.1. Проверка логов
-```bash
-# Просмотр логов DNS-сервера
-tail -f /var/log/messages | grep named
 
-# Просмотр логов через rndc
-rndc stats
-```
-
-#### 8.2. Проверка состояния сервера
-```bash
-# Проверка состояния сервера
-rndc status
-
-# Перезагрузка конфигурации
-rndc reload
-```
-
-#### 8.3. Типичные проблемы и решения
+### 8. Типичные проблемы и решения
 
 **Проблема 1: Сервер не запускается**
 ```bash
 # Проверка конфигурации
-named-checkconf /var/lib/bind/etc/named.conf
+named-checkconf /etc/bind/named.conf
 
 # Проверка зон
-named-checkzone sa.test /var/lib/bind/zone/sa.test
+named-checkzone sa.test /etc/bind/zone/sa.test
 ```
 
 **Проблема 2: Нет доступа к DNS-серверу**
