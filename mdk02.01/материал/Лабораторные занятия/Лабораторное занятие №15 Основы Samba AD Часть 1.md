@@ -164,8 +164,8 @@ sidorov
 # Создаем группу IT-Department
 samba-tool group add "IT-Department"
 
-# Создаем группу Users
-samba-tool group add "Users"
+# Создаем группу Sales
+samba-tool group add "Sales"
 ```
 
 4. Проверьте созданные группы:
@@ -178,8 +178,8 @@ samba-tool group list
 # Добавляем ivanov и petrov в группу IT-Department
 samba-tool group addmembers "IT-Department" ivanov,petrov
 
-# Добавляем sidorov в группу Users
-samba-tool group addmembers "Users" sidorov
+# Добавляем sidorov в группу Sales
+samba-tool group addmembers "Sales" sidorov
 ```
 
 6. Проверьте членство в группах:
@@ -187,8 +187,8 @@ samba-tool group addmembers "Users" sidorov
 # Проверка членов группы IT-Department
 samba-tool group listmembers "IT-Department"
 
-# Проверка членов группы Users
-samba-tool group listmembers "Users"
+# Проверка членов группы Sales
+samba-tool group listmembers "Sales"
 ```
 
 ---
@@ -335,7 +335,7 @@ samba-tool ou list
 5. Проверьте членство в группах:
 ```bash
 samba-tool group listmembers "IT-Department"
-samba-tool group listmembers "Users"
+samba-tool group listmembers "Sales"
 ```
 
 **На машине cli:**
