@@ -199,7 +199,7 @@ samba-tool group listmembers "Sales"
 
 1. Создайте организационное подразделение "IT":
 ```bash
-samba-tool ou add "OU=IT,DC=SA,DC=local"
+samba-tool ou add "OU=IT,DC=SA,DC=test"
 ```
 
 2. Проверьте создание OU:
@@ -209,30 +209,22 @@ samba-tool ou list
 
 Должно отобразиться:
 ```
-OU=IT,DC=SA,DC=local
+OU=IT,DC=SA,DC=test
 ```
 
 3. Переместите пользователей в OU "IT":
 ```bash
 # Перемещаем пользователя ivanov
-samba-tool user move ivanov "OU=IT,DC=SA,DC=local"
+samba-tool user move ivanov "OU=IT,DC=SA,DC=test"
 
 # Перемещаем пользователя petrov
-samba-tool user move petrov "OU=IT,DC=SA,DC=local"
+samba-tool user move petrov "OU=IT,DC=SA,DC=test"
 ```
 
 4. Переместите группу "IT-Department" в OU "IT":
 ```bash
-samba-tool group move "IT-Department" "OU=IT,DC=SA,DC=local"
+samba-tool group move "IT-Department" "OU=IT,DC=SA,DC=test"
 ```
-
-5. Проверьте структуру OU:
-```bash
-# Просмотр объектов в OU IT
-ldapsearch -H ldap://localhost -D "Administrator@sa.test" -W -b "OU=IT,DC=SA,DC=local" "(objectClass=*)"
-```
-
-Введите пароль администратора: `P@ssw0rd`
 
 ---
 

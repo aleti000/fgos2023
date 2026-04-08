@@ -312,17 +312,8 @@ domain sa.test
 nameserver 192.168.1.3
 EOF
 ```
-На машине srv настройте DNS-сервер:
 
-```bash
-# Настройка локального DNS-сервера
-cat > /etc/net/ifaces/ens18/resolv.conf << 'EOF'
-domain sa.test
-nameserver 192.168.1.3
-EOF
-```
-
-Для настройки DNS на машине cli нужно внести/изменить(если существуют) опции в настройки DHCP-сервера на машине **isp**:
+Для настройки DNS на машине cli и srv нужно внести/изменить(если существуют) опции в настройки DHCP-сервера на машине **isp**:
 
 ```bash
 option domain-name-servers 192.168.1.3;
